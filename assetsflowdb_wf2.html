@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assets Flow Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        header .date-range {
+            margin-top: 1rem;
+        }
+
+        header label, header input {
+            margin-right: 0.5rem;
+        }
+
+        main {
+            padding: 2rem;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .block {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            flex: 1 1 100%;
+        }
+
+        .block.half-width {
+            flex: 1 1 48%;
+        }
+
+        .block.full-width {
+            flex: 1 1 100%;
+        }
+
+        .block-title {
+            font-size: 1.2rem;
+            color: #4CAF50;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary, .content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        footer {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .net-flows, .accounts {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .accounts-details {
+            display: flex;
+            flex-direction: row;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Assets Flow Dashboard</h1>
+        <div class="date-range">
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate">
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate">
+        </div>
+    </header>
+    <main>
+        <div class="container">
+            <!-- Block A -->
+            <div class="block full-width" id="blockA">
+                <div class="block-title">Net $ Flows — $xxx</div>
+                <div class="content">
+                    <div class="net-flows">
+                        <p>Calculation: $xxx = contributions + (dividends) + interest + (withdrawals) + (fees)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="block full-width" id="blockA2">
+                <div class="block-title">Number of Accounts</div>
+                <div class="content">
+                    <div class="accounts-details">
+                        <p>Total: <span id="totalAccounts">0</span></p>
+                        <p>New: <span id="newAccounts">0</span></p>
+                        <p>Lost: <span id="lostAccounts">0</span></p>
+                        <p>Change: <span id="accountsChangePercentage">0%</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Block B -->
+            <div class="block half-width" id="blockB">
+                <div class="block-title">Period Summary</div>
+                <div class="content">
+                    <ul>
+                        <li>Beginning Balance: <span id="beginningBalance">$0</span></li>
+                        <li>Inflows: <span id="inflows">$0</span></li>
+                        <li>Outflows: <span id="outflows">$0</span></li>
+                        <li>Fees: <span id="fees">$0</span></li>
+                        <li>Ending Balance: <span id="endingBalance">$0</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="block half-width" id="chartBlock">
+                <div class="block-title">Net Flow Chart</div>
+                <canvas id="netFlowChart"></canvas>
+            </div>
+
+            <!-- Block C -->
+            <div class="block full-width" id="blockC">
+                <div class="block-title">Details</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Household</th>
+                                <th>Client</th>
+                                <th>BB</th>
+                                <th>In</th>
+                                <th>Out</th>
+                                <th>Fee</th>
+                                <th>EB</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Household 1</td>
+                                <td>Client A</td>
+                                <td>$10,000</td>
+                                <td>$1,000</td>
+                                <td>($500)</td>
+                                <td>($50)</td>
+                                <td>$10,450</td>
+                            </tr>
+                            <tr>
+                                <td>Household 2</td>
+                                <td>Client B</td>
+                                <td>$15,000</td>
+                                <td>$1,500</td>
+                                <td>($700)</td>
+                                <td>($70)</td>
+                                <td>$15,730</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Assets Flow Dashboard</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Assets Flow Dashboard Loaded');
+
+            // Dummy data for the net flow chart
+            const netFlowData = {
+                labels: ['January', 'February', 'March', 'April', 'May'],
+                datasets: [
+                    {
+                        label: 'Inflows',
+                        data: [1000, 1200, 1500, 1300, 1600],
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    },
+                    {
+                        label: 'Outflows',
+                        data: [-500, -400, -300, -200, -100],
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    },
+                    {
+                        label: 'Fees',
+                        data: [-50, -60, -70, -80, -90],
+                        backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                    }
+                ]
+            };
+
+            const netFlowConfig = {
+                type: 'bar',
+                data: netFlowData,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            stacked: true
+                        },
+                        x: {
+                            stacked: true
+                        }
+                    }
+                }
+            };
+
+            const netFlowChart = new Chart(
+                document.getElementById('netFlowChart'),
+                netFlowConfig
+            );
+
+            // Date range event listeners
+            document.getElementById('startDate').addEventListener('change', updateDateRange);
+            document.getElementById('endDate').addEventListener('change', updateDateRange);
+
+            function updateDateRange() {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                console.log(`Date range updated: ${startDate} to ${endDate}`);
+                
+                // Update the widgets and charts here based on the date range
+                // For now, just logging the date range
+            }
+        });
+    </script>
+</body>
+</html>
