@@ -25,7 +25,7 @@
             margin-top: 1rem;
         }
 
-        header label, header input {
+        header label, header input, header select {
             margin-right: 0.5rem;
         }
 
@@ -135,6 +135,14 @@
 <body>
     <header>
         <h1>Assets Flow Dashboard</h1>
+        <div class="date-range">
+            <label for="timeRangeSelector">Time Range:</label>
+            <select id="timeRangeSelector">
+                <option value="ytd">Year to Date</option>
+                <option value="last6months">Last 6 Months</option>
+                <option value="lastmonth">Last Month</option>
+            </select>
+        </div>
         <div class="date-range">
             <label for="startDate">Start Date:</label>
             <input type="date" id="startDate">
@@ -253,6 +261,45 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Assets Flow Dashboard Loaded');
+
+            // Function to set date range based on the selected time range
+            function setDateRange(option) {
+                const startDateInput = document.getElementById('startDate');
+                const endDateInput = document.getElementById('endDate');
+                const currentDate = new Date();
+                let startDate, endDate;
+
+                switch (option) {
+                    case 'ytd':
+                        startDate = new Date(currentDate);
+                        startDate.setFullYear(currentDate.getFullYear() - 1);
+                        endDate = currentDate;
+                        break;
+                    case 'last6months':
+                        startDate = new Date();
+                        startDate.setMonth(currentDate.getMonth() - 6);
+                        endDate = currentDate;
+                        break;
+                    case 'lastmonth':
+                        startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+                        endDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
+                        break;
+                    default:
+                        startDate = currentDate;
+                        endDate = currentDate;
+                }
+
+                startDateInput.value = startDate.toISOString().slice(0, 10);
+                endDateInput.value = endDate.toISOString().slice(0, 10);
+            }
+
+            // Set the default date range to "Year to Date"
+            setDateRange('ytd');
+
+            // Event listener for the time range selector
+            document.getElementById('timeRangeSelector').addEventListener('change', function() {
+                setDateRange(this.value);
+            });
 
             // Dummy data for the net flow chart
             const netFlowData = {
